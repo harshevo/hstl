@@ -34,7 +34,7 @@ hstd::String::String(const hstd::String &s) {
 
 void hstd::String::Print(std::ostream &os) const { os << m_buffer; }
 
-std::ostream &operator<<(std::ostream &os, const hstd::String &s) {
+std::ostream &hstd::operator<<(std::ostream &os, const hstd::String &s) {
   s.Print(os);
   return os;
 }
