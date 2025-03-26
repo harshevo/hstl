@@ -2,7 +2,6 @@
 #define HSTL_HPP
 
 #include <cstddef>
-#include <cstdint>
 #include <cstring>
 #include <ostream>
 
@@ -86,6 +85,39 @@ public:
 };
 template <typename T, typename... Args>
 Shared_ptr<T> make_shared(Args &&...args);
+
+/*
+
+ Vector
+
+*/
+template <typename T> class Vector {
+
+public:
+  Vector() { ReAlloc(2); }
+  ~Vector();
+
+  T &PushBack(const T &data) = delete;
+  T &PushBack(T &&data);
+  template <typename... Args> T &EmplaceBack(Args &&...args);
+  void Erase(size_t index);
+  void PopBack();
+
+  size_t size() const;
+  size_t capacity() const;
+
+  const T &operator[](size_t index) const;
+  T &operator[](size_t index);
+
+private:
+  void ReAlloc(size_t new_capacity);
+  void Clear();
+
+private:
+  T *m_data = nullptr;
+  size_t m_size = 0;
+  size_t m_capacity = 0;
+};
 
 }; // namespace hstd
 #endif

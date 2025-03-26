@@ -57,7 +57,9 @@ template <typename T> Shared_ptr<T>::~Shared_ptr() {
   if (*m_ref == 0) {
     if (m_ptr != nullptr) {
       delete m_ptr;
+      std::cout << "[INFO: ] nullptr Deleting m_ptr " << std::endl;
     }
+    std::cout << "[INFO: ] Deleting m_ref: " << *m_ref << std::endl;
     delete m_ref;
   }
 }
