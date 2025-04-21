@@ -1,0 +1,45 @@
+#include <iostream>
+#include <string>
+
+struct Address
+{
+	std::string city;
+	std::string country;
+};
+
+struct Person
+{
+	std::string name;
+	int age;
+	Address address;
+};
+
+template <typename T> struct Reflect; // forward declaration no other way
+// or use macros
+
+template <> struct Reflect<Person>
+{
+	static constexpr auto fields =
+		std::make_tuple(std::make_pair("name", &Person::name), std::make_pair("age", &Person::age),
+						std::make_pair("address", &Person::address));
+};
+
+template <> struct Reflect<Address>
+{
+	// used initializer list here for fun
+	static constexpr auto fields{
+		std::make_tuple(std::make_pair("city", &Address::city), std::make_pair("country", &Address::country))};
+};
+
+// type check
+
+template <typename T, typename = void> struct is_reflectable : std::false_type
+{
+};
+
+int main()
+{
+	// Person p{"Don", 30, {"New York", "USA"}};
+	//
+	// SerializeText(p, std::cout);
+}

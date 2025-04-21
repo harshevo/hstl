@@ -1,9 +1,9 @@
 1- Smart Pointers [Done]
 2- Containers -> Vectors, Maps
-3- Iterator
+3- Iterator -> Done
 4- Allocator -> Arena Allocator 
 5- Reflections
-6- Serializer and Deserializer
+6- Serializer and Deserializer -> Done
 7- Phyisics Engine
-8- Data Structures
+8- Data Structures -> Done
 
