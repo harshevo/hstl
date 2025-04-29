@@ -1,3 +1,4 @@
+#include <cstdint>
 #include <iostream>
 #include <string>
 
@@ -5,63 +6,73 @@ struct Address
 {
 	std::string city;
 	std::string country;
+	uint16_t postalcode;
+
+	auto isReflect() const
+	{
+		auto tuple = std::make_tuple(std::make_pair("city", city), std::make_pair("country", country),
+									 std::make_pair("postalcode", postalcode));
+		return tuple;
+	};
 };
 
 struct Person
 {
+	std::string id;
 	std::string name;
-	int age;
 	Address address;
+
+	auto isReflect() const
+	{
+		auto tuple =
+			std::make_tuple(std::make_pair("id", id), std::make_pair("name", name), std::make_pair("address", address));
+		return tuple;
+	};
 };
 
-template <typename T> struct Reflect;
-
-template <> struct Reflect<Person>
+struct Server
 {
-	static constexpr auto fields =
-		std::make_tuple(std::make_pair("name", &Person::name), std::make_pair("age", &Person::age),
-						std::make_pair("address", &Person::address));
+	std::string id;
+	Person person;
+
+	auto isReflect() const
+	{
+		auto tuple = std::make_tuple(std::make_pair("id", id), std::make_pair("person", person));
+		return tuple;
+	};
 };
 
-template <> struct Reflect<Address>
+template <typename T, typename = void> struct IsReflectable : std::false_type
 {
-	static constexpr auto fields =
-		std::make_tuple(std::make_pair("city", &Address::city), std::make_pair("country", &Address::country));
 };
 
-template <typename T, typename = void> struct is_reflectable : std::false_type
-{
-};
-
-template <typename T> struct is_reflectable<T, std::void_t<decltype(Reflect<T>::fields)>> : std::true_type
+template <typename T>
+struct IsReflectable<T, std::void_t<decltype(std::declval<const T &>().isReflect())>> : std::true_type
 {
 };
 
 template <typename T> void SerializeText(const T &obj, std::ostream &os, int indent = 0)
 {
-	std::string indent_s = " ";
-
-	if constexpr (is_reflectable<T>::value)
+	if constexpr (IsReflectable<T>::value)
 	{
-		auto fields = Reflect<T>::fields;
+		auto fields = obj.isReflect();
 
 		std::apply(
 			[&](auto &&...pair) {
-				((os << std::string(indent, ' ') << pair.first << ": ", SerializeText(obj.*pair.second, os, indent = 2),
-				  os << "\n"),
+				((os << std::string(indent, ' ') << pair.first << ": ", SerializeText(pair.second, os, indent + 2)),
 				 ...);
 			},
 			fields);
 	}
 	else
 	{
-		os << obj;
+		os << obj << "\n";
 	}
-}
+};
 
 int main()
 {
-	Person p{"Don", 21, {"Delhi", "India"}};
+	Server p = {"1", {"1", "Don", {"Delhi", "India", 2030}}};
 
 	SerializeText(p, std::cout);
 }
